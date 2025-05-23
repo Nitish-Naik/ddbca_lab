@@ -57,3 +57,73 @@ contract VotingSystem {
 
 
 // ["Alice", "Bob", "Charlie"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+pragma solidity ^0.8.0;
+
+contract SimpleVoting {
+    address public owner;
+
+    struct Candidate {
+        string name;
+        uint voteCount;
+    }
+
+    mapping(address => bool) public hasVoted;
+    Candidate[] public candidates;
+
+    constructor(string[] memory names) {
+        owner = msg.sender;
+        for (uint i = 0; i < names.length; i++) {
+            candidates.push(Candidate(names[i], 0));
+        }
+    }
+
+    function vote(uint index) public {
+        require(!hasVoted[msg.sender], "Already voted");
+        require(index < candidates.length, "Invalid candidate");
+        
+        candidates[index].voteCount++;
+        hasVoted[msg.sender] = true;
+    }
+
+    function getCandidateCount() public view returns (uint) {
+        return candidates.length;
+    }
+
+    function getVotes(uint index) public view returns (uint) {
+        require(index < candidates.length, "Invalid candidate");
+        return candidates[index].voteCount;
+    }
+
+    function getWinner() public view returns (string memory winnerName, uint winnerVotes) {
+        uint maxVotes = 0;
+        uint winnerIndex = 0;
+
+        for (uint i = 0; i < candidates.length; i++) {
+            if (candidates[i].voteCount > maxVotes) {
+                maxVotes = candidates[i].voteCount;
+                winnerIndex = i;
+            }
+        }
+
+        winnerName = candidates[winnerIndex].name;
+        winnerVotes = candidates[winnerIndex].voteCount;
+    }
+}
